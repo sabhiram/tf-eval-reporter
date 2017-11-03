@@ -5,4 +5,10 @@ setup(name="eval_reporter",
       description="tensorflow correctness reporter",
       url="https://github.com/sabhiram/tf-eval-reporterer",
       author="sabhiram",
+      install_requires=[
+        "scipy",
+        "numpy",
+        "pillow",
+        "tensorflow",
+      ],
       packages=["eval_reporter"])

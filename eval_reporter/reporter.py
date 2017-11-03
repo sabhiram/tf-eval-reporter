@@ -50,10 +50,10 @@ class EvalReporter(object):
             TODO: The lengths of the incoming tensors must match!
         """
         self.clear()
-        self.op = tf.py_func(self._pyfunc, [images, actual, expected], tf.float32)
+        self.op = tf.py_func(self._pyfunc, [images, predicted, expected], tf.float32)
 
 
-    def _pyfunc(images, actual, expected):
+    def _pyfunc(images, predicted, expected):
         """ _pyfunc is the python_func's "op" which will accept a list of the
             images, predicted classes and the expectations.  These at this point
             are NOT tensors, but are `numpy.ndarray`'s.
@@ -66,17 +66,17 @@ class EvalReporter(object):
             im.save(bs, format="JPEG")                      # PIL.Image -> JPEG
             b64s = base64.b64encode(bs.getvalue())          # JPEG -> Base64
             total += 1
-            if expected[i] == actual[i]:
-                if actual[i] in self.success_histogram:
-                    self.success_histogram[actual[i]].append(b64s)
+            if expected[i] == predicted[i]:
+                if predicted[i] in self.success_histogram:
+                    self.success_histogram[predicted[i]].append(b64s)
                 else:
-                    self.success_histogram[actual[i]] = [b64s]
+                    self.success_histogram[predicted[i]] = [b64s]
             else:
                 error += 1
-                if actual[i] in self.failure_histogram:
-                    self.failure_histogram[actual[i]].append([b64s, expected[i]])
+                if predicted[i] in self.failure_histogram:
+                    self.failure_histogram[predicted[i]].append([b64s, expected[i]])
                 else:
-                    self.failure_histogram[actual[i]] = [[b64s, expected[i]]]
+                    self.failure_histogram[predicted[i]] = [[b64s, expected[i]]]
 
         return np.float32(((total - error)/total) if total > 0 else 0)
 
@@ -111,8 +111,8 @@ class EvalReporter(object):
             html += "  <h3>Class {}</h3><br>\n".format(k)
             items = self.failure_histogram[k]
             for it in items:
-                f, actual = it[0], it[1]
-                html += """  <img src="data:image/jpeg;base64,{}" title="pred:{} exp:{}"/>""".format(f, k, actual)
+                f, predicted = it[0], it[1]
+                html += """  <img src="data:image/jpeg;base64,{}" title="pred:{} exp:{}"/>""".format(f, k, predicted)
         html += tail
         with open(file_path, "w") as fout:
             fout.write(html)
