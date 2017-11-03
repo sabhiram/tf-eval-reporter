@@ -53,7 +53,7 @@ class EvalReporter(object):
         self.op = tf.py_func(self._pyfunc, [images, predicted, expected], tf.float32)
 
 
-    def _pyfunc(images, predicted, expected):
+    def _pyfunc(self, images, predicted, expected):
         """ _pyfunc is the python_func's "op" which will accept a list of the
             images, predicted classes and the expectations.  These at this point
             are NOT tensors, but are `numpy.ndarray`'s.
