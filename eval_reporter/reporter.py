@@ -106,7 +106,7 @@ class EvalReporter(object):
     {%  for class, groups in me.failure_histogram.items() %}
         <h3>Class {{ class }}</h3><br>
         {%  for group in groups %}
-            <img src="data:image/jpeg;base64,{{group[0]}}" title="pred:{{group[1]}} exp:{{class}}" />
+            <img src="data:image/jpeg;base64,{{group[0]}}" title="pred:{{class}} exp:{{group[1]}}" />
         {%  endfor %}
     {%  endfor %}
     <hr><br><br>
