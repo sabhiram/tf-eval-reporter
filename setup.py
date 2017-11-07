@@ -9,6 +9,7 @@ setup(name="eval_reporter",
         "scipy",
         "numpy",
         "pillow",
-        "tensorflow",
+        "jinja2",
+        # "tensorflow",
       ],
       packages=["eval_reporter"])

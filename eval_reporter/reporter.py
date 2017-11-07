@@ -20,18 +20,7 @@ import cStringIO
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-
-################################################################################
-
-head = """<!DOCTYPE html>
-<html>
-<head>
-  <title>Prediction Analyzer</title>
-</head>
-<body>"""
-tail = """</body>
-</html>
-"""
+from jinja2 import Template
 
 ################################################################################
 
@@ -98,23 +87,33 @@ class EvalReporter(object):
     def write_html_file(self, file_path):
         """ write_html_file dumps the current histograms to the specified `file_path`.
         """
-        html = head
-        html += "  <h1>Correct Predictions</h1><br>\n"
-        for k in self.success_histogram:
-            html += "  <h3>Class {}</h3><br>\n".format(k)
-            files = self.success_histogram[k]
-            for f in files:
-                html += """  <img src="data:image/jpeg;base64,{}" title="class:{}"/>""".format(f, k)
-        html += "  <hr><br><br>\n"
-        html += "  <h1>Incorrect Predictions</h1><br>\n"
-        for k in self.failure_histogram:
-            html += "  <h3>Class {}</h3><br>\n".format(k)
-            items = self.failure_histogram[k]
-            for it in items:
-                f, predicted = it[0], it[1]
-                html += """  <img src="data:image/jpeg;base64,{}" title="pred:{} exp:{}"/>""".format(f, k, predicted)
-        html += tail
+        report = Template("""<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Analyzer</title>
+</head>
+<body>
+    <h1>Correct Predictions</h1><br>
+    {%  for class, images in me.success_histogram.items() %}
+        <h3>Class {{ class }}</h3><br>
+        {%  for img in images %}
+            <img src="data:image/jpeg;base64,{{img}}" title="class:{{class}}" />
+        {%  endfor %}
+    {%  endfor %}
+    <hr><br><br>
+
+    <h1>Incorrect Predictions</h1><br>
+    {%  for class, groups in me.failure_histogram.items() %}
+        <h3>Class {{ class }}</h3><br>
+        {%  for group in groups %}
+            <img src="data:image/jpeg;base64,{{group[0]}}" title="pred:{{group[1]}} exp:{{class}}" />
+        {%  endfor %}
+    {%  endfor %}
+    <hr><br><br>
+</body>
+</html>
+""").render(me=self)
         with open(file_path, "w") as fout:
-            fout.write(html)
+            fout.write(report)
 
 ################################################################################
